@@ -1,7 +1,6 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
-import { getDirectoryDiff, DiffFileInfo, getRepoRoot } from './gitService';
-import { createGitUri } from './gitContentProvider';
+import { getDirectoryDiff, DiffFileInfo } from './gitService';
 
 /**
  * Represents a file or folder node in the Changes tree view
@@ -119,16 +118,8 @@ export class ChangesTreeProvider implements vscode.TreeDataProvider<ChangeTreeIt
     private compareContext: CompareContext | null = null;
     private changedFiles: DiffFileInfo[] = [];
     private rootItems: ChangeTreeItem[] = [];
-    private treeView: vscode.TreeView<ChangeTreeItem> | null = null;
 
     constructor() {}
-
-    /**
-     * Set the TreeView reference for expand/collapse operations
-     */
-    setTreeView(treeView: vscode.TreeView<ChangeTreeItem>): void {
-        this.treeView = treeView;
-    }
 
     /**
      * Set the comparison context and fetch changed files
@@ -181,7 +172,6 @@ export class ChangesTreeProvider implements vscode.TreeDataProvider<ChangeTreeIt
             let currentPath = '';
             
             for (const part of pathParts) {
-                const parentPath = currentPath;
                 currentPath = currentPath ? `${currentPath}/${part}` : part;
                 
                 if (!folderMap.has(currentPath)) {
@@ -240,48 +230,6 @@ export class ChangesTreeProvider implements vscode.TreeDataProvider<ChangeTreeIt
     }
 
     /**
-     * Expand all nodes in the tree
-     */
-    async expandAll(): Promise<void> {
-        console.log('[JB-Git] expandAll called, rootItems count:', this.rootItems.length);
-        if (this.rootItems.length === 0) {
-            console.log('[JB-Git] No items to expand');
-            return;
-        }
-        this.setAllCollapsibleStates(this.rootItems, vscode.TreeItemCollapsibleState.Expanded);
-        this._onDidChangeTreeData.fire(undefined);
-        console.log('[JB-Git] expandAll completed');
-    }
-
-    /**
-     * Collapse all nodes in the tree
-     */
-    async collapseAll(): Promise<void> {
-        console.log('[JB-Git] collapseAll called, rootItems count:', this.rootItems.length);
-        if (this.rootItems.length === 0) {
-            console.log('[JB-Git] No items to collapse');
-            return;
-        }
-        this.setAllCollapsibleStates(this.rootItems, vscode.TreeItemCollapsibleState.Collapsed);
-        this._onDidChangeTreeData.fire(undefined);
-        console.log('[JB-Git] collapseAll completed');
-    }
-
-    /**
-     * Recursively set collapsible state for all folder nodes
-     */
-    private setAllCollapsibleStates(items: ChangeTreeItem[], state: vscode.TreeItemCollapsibleState): void {
-        for (const item of items) {
-            if (item.isFolder && item.children.length > 0) {
-                // Update the collapsibleState property
-                (item as any).collapsibleState = state;
-                console.log(`[JB-Git] Setting ${item.label} to ${state === vscode.TreeItemCollapsibleState.Expanded ? 'Expanded' : 'Collapsed'}`);
-                this.setAllCollapsibleStates(item.children, state);
-            }
-        }
-    }
-
-    /**
      * Clear the current comparison
      */
     clear(): void {
@@ -298,13 +246,6 @@ export class ChangesTreeProvider implements vscode.TreeDataProvider<ChangeTreeIt
         if (this.compareContext) {
             await this.setCompareContext(this.compareContext);
         }
-    }
-
-    /**
-     * Get the current compare context
-     */
-    getCompareContext(): CompareContext | null {
-        return this.compareContext;
     }
 
     getTreeItem(element: ChangeTreeItem): vscode.TreeItem {

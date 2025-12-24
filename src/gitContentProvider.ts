@@ -21,21 +21,14 @@ export class GitContentProvider implements vscode.TextDocumentContentProvider {
         const params = new URLSearchParams(uri.query);
         const ref = params.get('ref');
 
-        console.log('[JB-Git] provideTextDocumentContent called');
-        console.log('[JB-Git] URI:', uri.toString());
-        console.log('[JB-Git] fsPath:', filePath);
-        console.log('[JB-Git] Ref:', ref);
-
         if (!ref) {
             throw new Error('No git reference specified in URI');
         }
 
         try {
             const content = await getFileContentAtRef(filePath, ref);
-            console.log('[JB-Git] Content loaded successfully, length:', content.length);
             return content;
         } catch (error: any) {
-            console.error('[JB-Git] Error loading content:', error);
             return `// Error loading content: ${error.message}`;
         }
     }
@@ -52,4 +45,3 @@ export function createGitUri(filePath: string, ref: string): vscode.Uri {
         query: `ref=${encodeURIComponent(ref)}`
     });
 }
-

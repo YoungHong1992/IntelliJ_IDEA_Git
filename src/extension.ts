@@ -5,8 +5,6 @@ import { compareWithBranch } from './commands/compareWithBranch';
 import { getChangesTreeProvider, ChangeTreeItem } from './changesTreeProvider';
 
 export function activate(context: vscode.ExtensionContext) {
-    console.log('JetBrains Git extension is now active!');
-
     // Register the TextDocumentContentProvider for git content
     const gitContentProvider = new GitContentProvider();
     context.subscriptions.push(
@@ -18,7 +16,6 @@ export function activate(context: vscode.ExtensionContext) {
     const treeView = vscode.window.createTreeView('ideaGitChangesView', {
         treeDataProvider: changesTreeProvider
     });
-    changesTreeProvider.setTreeView(treeView);
     context.subscriptions.push(treeView);
 
     // Register commands
