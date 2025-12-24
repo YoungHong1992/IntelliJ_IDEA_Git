@@ -3,6 +3,14 @@
   "displayName": "IntelliJ IDEA Git",
   "description": "IntelliJ IDEA-style Git operations for VS Code - Compare with Revision, Compare with Branch/Tag",
   "version": "0.2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/YoungHong1992/IntelliJ_IDEA_Git.git"
+  },
+  "homepage": "https://github.com/YoungHong1992/IntelliJ_IDEA_Git#readme",
+  "bugs": {
+    "url": "https://github.com/YoungHong1992/IntelliJ_IDEA_Git/issues"
+  },
   "publisher": "your-publisher-name",
   "engines": {
     "vscode": "^1.85.0"
