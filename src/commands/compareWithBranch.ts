@@ -150,7 +150,7 @@ export async function compareWithBranch(uri?: vscode.Uri): Promise<void> {
         await changesTreeProvider.setCompareContext(context);
 
         // Show the Changes panel
-        await vscode.commands.executeCommand('jbGitChangesView.focus');
+        await vscode.commands.executeCommand('ideaGitChangesView.focus');
         
         vscode.window.showInformationMessage(
             `Comparing "${fileName}" with ${ref.name}. See Changes panel.`

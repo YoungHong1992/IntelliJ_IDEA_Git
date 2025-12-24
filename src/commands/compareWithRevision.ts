@@ -106,7 +106,7 @@ export async function compareWithRevision(uri?: vscode.Uri): Promise<void> {
         await changesTreeProvider.setCompareContext(context);
 
         // Show the Changes panel
-        await vscode.commands.executeCommand('jbGitChangesView.focus');
+        await vscode.commands.executeCommand('ideaGitChangesView.focus');
         
         vscode.window.showInformationMessage(
             `Comparing "${fileName}" with revision ${commit.shortHash}. See Changes panel.`

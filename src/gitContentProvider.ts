@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import { getFileContentAtRef } from './gitService';
 
-export const SCHEME = 'jb-git';
+export const SCHEME = 'idea-git';
 
 /**
  * TextDocumentContentProvider for displaying Git file content at specific revisions.

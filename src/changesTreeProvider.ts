@@ -38,7 +38,7 @@ export class ChangeTreeItem extends vscode.TreeItem {
             
             // Set command to open diff on click
             this.command = {
-                command: 'jetbrains-git.openFileDiff',
+                command: 'intellij-idea-git.openFileDiff',
                 title: 'Open Diff',
                 arguments: [this]
             };
@@ -85,13 +85,13 @@ export class ChangeTreeItem extends vscode.TreeItem {
     private getFileIcon(status: string): vscode.ThemeIcon {
         switch (status) {
             case 'A':
-                return new vscode.ThemeIcon('diff-added', new vscode.ThemeColor('jbGit.addedFile'));
+                return new vscode.ThemeIcon('diff-added', new vscode.ThemeColor('ideaGit.addedFile'));
             case 'M':
-                return new vscode.ThemeIcon('diff-modified', new vscode.ThemeColor('jbGit.modifiedFile'));
+                return new vscode.ThemeIcon('diff-modified', new vscode.ThemeColor('ideaGit.modifiedFile'));
             case 'D':
-                return new vscode.ThemeIcon('diff-removed', new vscode.ThemeColor('jbGit.deletedFile'));
+                return new vscode.ThemeIcon('diff-removed', new vscode.ThemeColor('ideaGit.deletedFile'));
             case 'R':
-                return new vscode.ThemeIcon('diff-renamed', new vscode.ThemeColor('jbGit.modifiedFile'));
+                return new vscode.ThemeIcon('diff-renamed', new vscode.ThemeColor('ideaGit.modifiedFile'));
             default:
                 return new vscode.ThemeIcon('file');
         }

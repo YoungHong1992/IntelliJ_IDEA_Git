@@ -1,7 +1,7 @@
 {
-  "name": "jetbrains-git",
-  "displayName": "JetBrains Git",
-  "description": "JetBrains-style Git operations for VS Code - Compare with Revision, Compare with Branch/Tag",
+  "name": "intellij-idea-git",
+  "displayName": "IntelliJ IDEA Git",
+  "description": "IntelliJ IDEA-style Git operations for VS Code - Compare with Revision, Compare with Branch/Tag",
   "version": "0.2.0",
   "publisher": "your-publisher-name",
   "engines": {
@@ -13,7 +13,8 @@
   ],
   "keywords": [
     "git",
-    "jetbrains",
+    "intellij",
+    "idea",
     "compare",
     "revision",
     "branch",
@@ -28,16 +29,16 @@
     "viewsContainers": {
       "activitybar": [
         {
-          "id": "jb-git-changes",
+          "id": "idea-git-changes",
           "title": "Changes",
           "icon": "$(git-compare)"
         }
       ]
     },
     "views": {
-      "jb-git-changes": [
+      "idea-git-changes": [
         {
-          "id": "jbGitChangesView",
+          "id": "ideaGitChangesView",
           "name": "Changes",
           "icon": "$(git-compare)",
           "contextualTitle": "Git Changes"
@@ -46,98 +47,98 @@
     },
     "viewsWelcome": [
       {
-        "view": "jbGitChangesView",
+        "view": "ideaGitChangesView",
         "contents": "No comparison active.\n\nRight-click on a file or folder and select:\n• Compare with Revision...\n• Compare with Branch or Tag..."
       }
     ],
     "submenus": [
       {
-        "id": "jetbrains.git.menu",
-        "label": "Git (JetBrains Style)"
+        "id": "intellij.idea.git.menu",
+        "label": "Git (IntelliJ IDEA Style)"
       }
     ],
     "menus": {
       "explorer/context": [
         {
-          "submenu": "jetbrains.git.menu",
+          "submenu": "intellij.idea.git.menu",
           "group": "navigation",
           "when": "resourceScheme == file"
         }
       ],
       "editor/context": [
         {
-          "submenu": "jetbrains.git.menu",
+          "submenu": "intellij.idea.git.menu",
           "group": "navigation",
           "when": "resourceScheme == file"
         }
       ],
       "editor/title/context": [
         {
-          "submenu": "jetbrains.git.menu",
+          "submenu": "intellij.idea.git.menu",
           "group": "navigation",
           "when": "resourceScheme == file"
         }
       ],
-      "jetbrains.git.menu": [
+      "intellij.idea.git.menu": [
         {
-          "command": "jetbrains-git.compareWithRevision",
+          "command": "intellij-idea-git.compareWithRevision",
           "group": "1_compare@1"
         },
         {
-          "command": "jetbrains-git.compareWithBranch",
+          "command": "intellij-idea-git.compareWithBranch",
           "group": "1_compare@2"
         }
       ],
       "view/title": [
         {
-          "command": "jetbrains-git.refreshChanges",
-          "when": "view == jbGitChangesView",
+          "command": "intellij-idea-git.refreshChanges",
+          "when": "view == ideaGitChangesView",
           "group": "navigation@1"
         },
         {
-          "command": "jetbrains-git.clearChanges",
-          "when": "view == jbGitChangesView",
+          "command": "intellij-idea-git.clearChanges",
+          "when": "view == ideaGitChangesView",
           "group": "navigation@2"
         }
       ],
       "view/item/context": [
         {
-          "command": "jetbrains-git.openFileDiff",
-          "when": "view == jbGitChangesView && viewItem == changedFile",
+          "command": "intellij-idea-git.openFileDiff",
+          "when": "view == ideaGitChangesView && viewItem == changedFile",
           "group": "inline"
         }
       ]
     },
     "commands": [
       {
-        "command": "jetbrains-git.compareWithRevision",
+        "command": "intellij-idea-git.compareWithRevision",
         "title": "Compare with Revision...",
         "icon": "$(git-compare)"
       },
       {
-        "command": "jetbrains-git.compareWithBranch",
+        "command": "intellij-idea-git.compareWithBranch",
         "title": "Compare with Branch or Tag...",
         "icon": "$(git-branch)"
       },
       {
-        "command": "jetbrains-git.openFileDiff",
+        "command": "intellij-idea-git.openFileDiff",
         "title": "Open Diff",
         "icon": "$(diff)"
       },
       {
-        "command": "jetbrains-git.clearChanges",
+        "command": "intellij-idea-git.clearChanges",
         "title": "Clear",
         "icon": "$(clear-all)"
       },
       {
-        "command": "jetbrains-git.refreshChanges",
+        "command": "intellij-idea-git.refreshChanges",
         "title": "Refresh",
         "icon": "$(refresh)"
       }
     ],
     "colors": [
       {
-        "id": "jbGit.addedFile",
+        "id": "ideaGit.addedFile",
         "description": "Color for added files",
         "defaults": {
           "dark": "#73c991",
@@ -146,7 +147,7 @@
         }
       },
       {
-        "id": "jbGit.modifiedFile",
+        "id": "ideaGit.modifiedFile",
         "description": "Color for modified files",
         "defaults": {
           "dark": "#e2c08d",
@@ -155,7 +156,7 @@
         }
       },
       {
-        "id": "jbGit.deletedFile",
+        "id": "ideaGit.deletedFile",
         "description": "Color for deleted files",
         "defaults": {
           "dark": "#f14c4c",

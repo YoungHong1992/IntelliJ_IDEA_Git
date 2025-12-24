@@ -1,16 +1,16 @@
-# JetBrains Git - VS Code Extension
+# IntelliJ IDEA Git - VS Code Extension
 
-为 VS Code 提供类似 JetBrains IDE 的 Git 操作体验。
+为 VS Code 提供类似 IntelliJ IDEA Git 的操作体验。
 
 ## 功能特性
 
 ### ✅ Compare with Revision（与历史版本比较）
-右键点击文件 → **Git (JetBrains Style)** → **Compare with Revision...**
+右键点击文件 → **Git (IntelliJ IDEA Style)** → **Compare with Revision...**
 - 显示该文件的所有提交历史
 - 选择任意历史版本与当前文件进行 Diff 对比
 
 ### ✅ Compare with Branch/Tag（与分支/标签比较）
-右键点击文件 → **Git (JetBrains Style)** → **Compare with Branch or Tag...**
+右键点击文件 → **Git (IntelliJ IDEA Style)** → **Compare with Branch or Tag...**
 - 显示所有本地分支、远程分支和标签
 - 选择任意引用与当前文件进行 Diff 对比
 
@@ -50,7 +50,7 @@ vsce package
 
 ## 技术实现
 
-- **TextDocumentContentProvider**: 自定义 `jb-git` scheme 读取 Git 历史版本内容
+- **TextDocumentContentProvider**: 自定义 `idea-git` scheme 读取 Git 历史版本内容
 - **QuickPick UI**: 友好的版本/分支选择界面
 - **vscode.diff**: 调用 VS Code 原生 Diff 视图
 

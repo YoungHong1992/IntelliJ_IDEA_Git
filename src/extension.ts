@@ -15,7 +15,7 @@ export function activate(context: vscode.ExtensionContext) {
 
     // Register the Changes TreeView
     const changesTreeProvider = getChangesTreeProvider();
-    const treeView = vscode.window.createTreeView('jbGitChangesView', {
+    const treeView = vscode.window.createTreeView('ideaGitChangesView', {
         treeDataProvider: changesTreeProvider
     });
     changesTreeProvider.setTreeView(treeView);
@@ -23,16 +23,16 @@ export function activate(context: vscode.ExtensionContext) {
 
     // Register commands
     context.subscriptions.push(
-        vscode.commands.registerCommand('jetbrains-git.compareWithRevision', compareWithRevision)
+        vscode.commands.registerCommand('intellij-idea-git.compareWithRevision', compareWithRevision)
     );
     
     context.subscriptions.push(
-        vscode.commands.registerCommand('jetbrains-git.compareWithBranch', compareWithBranch)
+        vscode.commands.registerCommand('intellij-idea-git.compareWithBranch', compareWithBranch)
     );
 
     // Command to open file diff from the Changes tree view
     context.subscriptions.push(
-        vscode.commands.registerCommand('jetbrains-git.openFileDiff', async (item: ChangeTreeItem) => {
+        vscode.commands.registerCommand('intellij-idea-git.openFileDiff', async (item: ChangeTreeItem) => {
             if (!item.fileInfo || !item.repoRoot || !item.ref) {
                 return;
             }
@@ -54,14 +54,14 @@ export function activate(context: vscode.ExtensionContext) {
 
     // Command to clear the Changes view
     context.subscriptions.push(
-        vscode.commands.registerCommand('jetbrains-git.clearChanges', () => {
+        vscode.commands.registerCommand('intellij-idea-git.clearChanges', () => {
             changesTreeProvider.clear();
         })
     );
 
     // Command to refresh the Changes view
     context.subscriptions.push(
-        vscode.commands.registerCommand('jetbrains-git.refreshChanges', async () => {
+        vscode.commands.registerCommand('intellij-idea-git.refreshChanges', async () => {
             await changesTreeProvider.refresh();
         })
     );
