@@ -6,8 +6,8 @@ on:
       - 'v*'
 
 jobs:
-  build:
-    name: Build and Release
+  publish:
+    name: Package and Publish (Tag)
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -22,14 +22,30 @@ jobs:
           node-version: 20
           cache: 'npm'
 
-      - name: Install Dependencies
+      - name: Install dependencies
         run: npm ci
 
-      - name: Package Extension
-        run: npx vsce package --out extension.vsix
+      - name: Install vsce
+        run: npm install -g @vscode/vsce
 
-      - name: Create Release
+      - name: Get version from tag
+        id: get_version
+        run: echo "version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+
+      - name: Update package.json version
+        run: |
+          npm version ${{ steps.get_version.outputs.version }} --no-git-tag-version --allow-same-version
+
+      - name: Package extension
+        run: vsce package --out intellij-idea-git-${{ steps.get_version.outputs.version }}.vsix
+
+      - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
-          files: extension.vsix
+          files: intellij-idea-git-${{ steps.get_version.outputs.version }}.vsix
           generate_release_notes: true
+
+      - name: Publish to VS Code Marketplace
+        env:
+          VSCE_PAT: ${{ secrets.VSCE_PAT }}
+        run: vsce publish --packagePath intellij-idea-git-${{ steps.get_version.outputs.version }}.vsix

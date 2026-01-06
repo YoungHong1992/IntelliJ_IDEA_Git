@@ -1,8 +1,9 @@
-.vscode/**
-.vscode-test/**
-src/**
-.gitignore
-tsconfig.json
-**/*.map
-**/*.ts
+# Ignore everything by default
+**
+
+# Include only necessary files
+!package.json
+!README.md
+!LICENSE
+!images/icon.png
 !out/**/*.js
