@@ -2,7 +2,7 @@
   "name": "intellij-idea-git",
   "displayName": "IntelliJ IDEA Git",
   "description": "IntelliJ IDEA-style Git operations for VS Code - Compare with Revision, Compare with Branch/Tag",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "repository": {
     "type": "git",
     "url": "https://github.com/YoungHong1992/IntelliJ_IDEA_Git.git"
