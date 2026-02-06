@@ -1,8 +1,8 @@
 {
   "name": "intellij-idea-git",
   "displayName": "IntelliJ IDEA Git",
-  "description": "IntelliJ IDEA-style Git operations for VS Code - Compare with Revision, Compare with Branch/Tag",
-  "version": "0.2.1",
+  "description": "IntelliJ IDEA-style Git operations for VS Code - Compare with Revision, Compare with Branch/Tag, Rebase onto",
+  "version": "0.3.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/YoungHong1992/IntelliJ_IDEA_Git.git"
@@ -26,7 +26,8 @@
     "compare",
     "revision",
     "branch",
-    "diff"
+    "diff",
+    "rebase"
   ],
   "icon": "images/icon.png",
   "activationEvents": [
@@ -95,6 +96,10 @@
         {
           "command": "intellij-idea-git.compareWithBranch",
           "group": "1_compare@2"
+        },
+        {
+          "command": "intellij-idea-git.rebaseOnto",
+          "group": "2_rebase@1"
         }
       ],
       "view/title": [
@@ -142,6 +147,11 @@
         "command": "intellij-idea-git.refreshChanges",
         "title": "Refresh",
         "icon": "$(refresh)"
+      },
+      {
+        "command": "intellij-idea-git.rebaseOnto",
+        "title": "Rebase onto...",
+        "icon": "$(git-merge)"
       }
     ],
     "colors": [

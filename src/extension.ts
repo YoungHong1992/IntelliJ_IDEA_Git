@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import { GitContentProvider, SCHEME, createGitUri } from './gitContentProvider';
 import { compareWithRevision } from './commands/compareWithRevision';
 import { compareWithBranch } from './commands/compareWithBranch';
+import { rebaseOnto } from './commands/rebaseOnto';
 import { getChangesTreeProvider, ChangeTreeItem } from './changesTreeProvider';
 
 export function activate(context: vscode.ExtensionContext) {
@@ -25,6 +26,10 @@ export function activate(context: vscode.ExtensionContext) {
     
     context.subscriptions.push(
         vscode.commands.registerCommand('intellij-idea-git.compareWithBranch', compareWithBranch)
+    );
+
+    context.subscriptions.push(
+        vscode.commands.registerCommand('intellij-idea-git.rebaseOnto', rebaseOnto)
     );
 
     // Command to open file diff from the Changes tree view
