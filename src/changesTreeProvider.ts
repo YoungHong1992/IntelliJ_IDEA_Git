@@ -135,9 +135,15 @@ export class ChangesTreeProvider implements vscode.TreeDataProvider<ChangeTreeIt
                 context.repoRoot
             );
         } else {
-            // Single file - just show that file
+            // Single file - detect the actual status from git diff
             const relativePath = path.relative(context.repoRoot, context.basePath).replace(/\\/g, '/');
-            this.changedFiles = [{
+            const allDiffs = await getDirectoryDiff(
+                path.dirname(context.basePath),
+                context.ref,
+                context.repoRoot
+            );
+            const matchedFile = allDiffs.find(f => f.path === relativePath);
+            this.changedFiles = [matchedFile ?? {
                 status: 'M',
                 path: relativePath
             }];

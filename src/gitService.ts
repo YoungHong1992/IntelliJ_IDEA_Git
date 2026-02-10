@@ -2,8 +2,12 @@ import * as vscode from 'vscode';
 import { execFile } from 'child_process';
 import { promisify } from 'util';
 import * as path from 'path';
+import * as fs from 'fs';
 
 const execFileAsync = promisify(execFile);
+
+/** Separator used in git log --pretty format to avoid conflicts with commit message content */
+const LOG_SEPARATOR = '\x00';
 
 export interface CommitInfo {
     hash: string;
@@ -34,7 +38,10 @@ export async function getRepoRoot(filePath: string): Promise<string> {
             cwd: dir,
             encoding: 'utf8'
         });
-        return stdout.trim();
+        // Normalize the path: git may return POSIX-style paths on Windows (e.g. /d/Projects/...)
+        // Convert to OS-native path format for consistent path operations
+        const rawPath = stdout.trim();
+        return path.resolve(rawPath);
     } catch (error) {
         throw new Error('Not a Git repository');
     }
@@ -52,7 +59,7 @@ export async function getFileHistory(filePath: string, limit: number = 50): Prom
             [
                 'log',
                 `--max-count=${limit}`,
-                '--pretty=format:%H|%h|%s|%an|%ad',
+                '--pretty=format:%H%x00%h%x00%s%x00%an%x00%ad',
                 '--date=short',
                 '--',
                 filePath
@@ -68,8 +75,14 @@ export async function getFileHistory(filePath: string, limit: number = 50): Prom
         }
 
         return stdout.trim().split('\n').map(line => {
-            const [hash, shortHash, message, author, date] = line.split('|');
-            return { hash, shortHash, message, author, date };
+            const parts = line.split(LOG_SEPARATOR);
+            return {
+                hash: parts[0],
+                shortHash: parts[1],
+                message: parts[2],
+                author: parts[3],
+                date: parts[4]
+            };
         });
     } catch (error) {
         console.error('Failed to get file history:', error);
@@ -240,7 +253,7 @@ export async function getDirectoryHistory(dirPath: string, limit: number = 50): 
             [
                 'log',
                 `--max-count=${limit}`,
-                '--pretty=format:%H|%h|%s|%an|%ad',
+                '--pretty=format:%H%x00%h%x00%s%x00%an%x00%ad',
                 '--date=short',
                 '--',
                 dirPath
@@ -256,8 +269,14 @@ export async function getDirectoryHistory(dirPath: string, limit: number = 50): 
         }
 
         return stdout.trim().split('\n').map(line => {
-            const [hash, shortHash, message, author, date] = line.split('|');
-            return { hash, shortHash, message, author, date };
+            const parts = line.split(LOG_SEPARATOR);
+            return {
+                hash: parts[0],
+                shortHash: parts[1],
+                message: parts[2],
+                author: parts[3],
+                date: parts[4]
+            };
         });
     } catch (error) {
         console.error('Failed to get directory history:', error);
@@ -265,3 +284,153 @@ export async function getDirectoryHistory(dirPath: string, limit: number = 50): 
     }
 }
 
+/**
+ * Get the current branch name
+ * Returns null if in detached HEAD state
+ */
+export async function getCurrentBranch(repoRoot: string): Promise<string | null> {
+    try {
+        const { stdout } = await execFileAsync(
+            'git',
+            ['symbolic-ref', '--short', 'HEAD'],
+            { cwd: repoRoot, encoding: 'utf8' }
+        );
+        return stdout.trim();
+    } catch {
+        // Detached HEAD state
+        return null;
+    }
+}
+
+/**
+ * Check if the working tree is clean (no uncommitted changes)
+ */
+export async function isWorkingTreeClean(repoRoot: string): Promise<boolean> {
+    try {
+        const { stdout } = await execFileAsync(
+            'git',
+            ['status', '--porcelain'],
+            { cwd: repoRoot, encoding: 'utf8' }
+        );
+        return stdout.trim() === '';
+    } catch {
+        return false;
+    }
+}
+
+/**
+ * Check if a rebase is currently in progress
+ */
+export async function isRebaseInProgress(repoRoot: string): Promise<boolean> {
+    try {
+        const { stdout } = await execFileAsync(
+            'git',
+            ['rev-parse', '--git-path', 'rebase-merge'],
+            { cwd: repoRoot, encoding: 'utf8' }
+        );
+        const rawPath = stdout.trim();
+        // git rev-parse --git-path may return an absolute path (e.g. with GIT_DIR or worktrees)
+        const rebaseMergePath = path.isAbsolute(rawPath)
+            ? rawPath
+            : path.join(repoRoot, rawPath);
+        
+        if (fs.existsSync(rebaseMergePath)) {
+            return true;
+        }
+
+        // Also check rebase-apply for older git rebase
+        const { stdout: applyOutput } = await execFileAsync(
+            'git',
+            ['rev-parse', '--git-path', 'rebase-apply'],
+            { cwd: repoRoot, encoding: 'utf8' }
+        );
+        const applyRawPath = applyOutput.trim();
+        const rebaseApplyPath = path.isAbsolute(applyRawPath)
+            ? applyRawPath
+            : path.join(repoRoot, applyRawPath);
+        return fs.existsSync(rebaseApplyPath);
+    } catch {
+        return false;
+    }
+}
+
+/**
+ * Execute git rebase onto a target ref
+ */
+export async function rebase(repoRoot: string, ontoRef: string): Promise<{ success: boolean; error?: string }> {
+    try {
+        await execFileAsync(
+            'git',
+            ['rebase', ontoRef],
+            { cwd: repoRoot, encoding: 'utf8' }
+        );
+        return { success: true };
+    } catch (error: any) {
+        return { 
+            success: false, 
+            error: error.stderr || error.message || 'Rebase failed'
+        };
+    }
+}
+
+/**
+ * Abort the current rebase
+ */
+export async function rebaseAbort(repoRoot: string): Promise<{ success: boolean; error?: string }> {
+    try {
+        await execFileAsync(
+            'git',
+            ['rebase', '--abort'],
+            { cwd: repoRoot, encoding: 'utf8' }
+        );
+        return { success: true };
+    } catch (error: any) {
+        return {
+            success: false,
+            error: error.stderr || error.message || 'Rebase abort failed'
+        };
+    }
+}
+
+/**
+ * Continue the current rebase after resolving conflicts
+ */
+export async function rebaseContinue(repoRoot: string): Promise<{ success: boolean; error?: string }> {
+    try {
+        await execFileAsync(
+            'git',
+            ['rebase', '--continue'],
+            {
+                cwd: repoRoot,
+                encoding: 'utf8',
+                // Prevent git from opening an interactive editor which would hang the extension
+                env: { ...process.env, GIT_EDITOR: 'true' }
+            }
+        );
+        return { success: true };
+    } catch (error: any) {
+        return { 
+            success: false, 
+            error: error.stderr || error.message || 'Rebase continue failed'
+        };
+    }
+}
+
+/**
+ * Get list of files with merge conflicts
+ */
+export async function getConflictFiles(repoRoot: string): Promise<string[]> {
+    try {
+        const { stdout } = await execFileAsync(
+            'git',
+            ['diff', '--name-only', '--diff-filter=U'],
+            { cwd: repoRoot, encoding: 'utf8' }
+        );
+        if (!stdout.trim()) {
+            return [];
+        }
+        return stdout.trim().split('\n').filter(f => f.trim());
+    } catch {
+        return [];
+    }
+}

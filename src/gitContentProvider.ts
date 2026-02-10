@@ -25,6 +25,11 @@ export class GitContentProvider implements vscode.TextDocumentContentProvider {
             throw new Error('No git reference specified in URI');
         }
 
+        // Return empty content for placeholder URIs (used for Added/Deleted file diffs)
+        if (ref === '__empty__') {
+            return '';
+        }
+
         try {
             const content = await getFileContentAtRef(filePath, ref);
             return content;
@@ -40,8 +45,10 @@ export class GitContentProvider implements vscode.TextDocumentContentProvider {
 export function createGitUri(filePath: string, ref: string): vscode.Uri {
     // Use Uri.file to properly handle paths on all platforms, then convert to our scheme
     const fileUri = vscode.Uri.file(filePath);
+    // Do NOT use encodeURIComponent here — VS Code's Uri.with() handles encoding internally.
+    // Double-encoding would corrupt refs containing special characters.
     return fileUri.with({
         scheme: SCHEME,
-        query: `ref=${encodeURIComponent(ref)}`
+        query: `ref=${ref}`
     });
 }

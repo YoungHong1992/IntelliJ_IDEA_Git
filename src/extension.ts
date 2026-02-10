@@ -1,7 +1,9 @@
 import * as vscode from 'vscode';
+import * as path from 'path';
 import { GitContentProvider, SCHEME, createGitUri } from './gitContentProvider';
 import { compareWithRevision } from './commands/compareWithRevision';
 import { compareWithBranch } from './commands/compareWithBranch';
+import { rebaseOnto } from './commands/rebaseOnto';
 import { getChangesTreeProvider, ChangeTreeItem } from './changesTreeProvider';
 
 export function activate(context: vscode.ExtensionContext) {
@@ -27,6 +29,10 @@ export function activate(context: vscode.ExtensionContext) {
         vscode.commands.registerCommand('intellij-idea-git.compareWithBranch', compareWithBranch)
     );
 
+    context.subscriptions.push(
+        vscode.commands.registerCommand('intellij-idea-git.rebaseOnto', rebaseOnto)
+    );
+
     // Command to open file diff from the Changes tree view
     context.subscriptions.push(
         vscode.commands.registerCommand('intellij-idea-git.openFileDiff', async (item: ChangeTreeItem) => {
@@ -34,15 +40,30 @@ export function activate(context: vscode.ExtensionContext) {
                 return;
             }
 
-            const filePath = require('path').join(item.repoRoot, item.fileInfo.path);
-            const fileUri = vscode.Uri.file(filePath);
-            const leftUri = createGitUri(filePath, item.ref);
-            
-            const fileName = require('path').basename(filePath);
+            const filePath = path.join(item.repoRoot, item.fileInfo.path);
+            const fileName = path.basename(filePath);
             const title = `${fileName} (${item.ref} ↔ Current)`;
 
             try {
-                await vscode.commands.executeCommand('vscode.diff', leftUri, fileUri, title);
+                const status = item.fileInfo.status;
+
+                if (status === 'D') {
+                    // Deleted file: show old version as read-only (no current file to diff against)
+                    const leftUri = createGitUri(filePath, item.ref);
+                    // Use an empty untitled URI for the right side
+                    const emptyUri = vscode.Uri.parse(`${SCHEME}:///dev/null?ref=__empty__`);
+                    await vscode.commands.executeCommand('vscode.diff', leftUri, emptyUri, `${fileName} (Deleted)`);
+                } else if (status === 'A') {
+                    // Added file: no old version exists, show empty on the left
+                    const fileUri = vscode.Uri.file(filePath);
+                    const emptyUri = vscode.Uri.parse(`${SCHEME}:///dev/null?ref=__empty__`);
+                    await vscode.commands.executeCommand('vscode.diff', emptyUri, fileUri, `${fileName} (Added)`);
+                } else {
+                    // Modified, Renamed, Copied: normal diff
+                    const fileUri = vscode.Uri.file(filePath);
+                    const leftUri = createGitUri(filePath, item.ref);
+                    await vscode.commands.executeCommand('vscode.diff', leftUri, fileUri, title);
+                }
             } catch (error: any) {
                 vscode.window.showErrorMessage(`Failed to open diff: ${error.message}`);
             }

@@ -5,14 +5,28 @@
 ## 功能特性
 
 ### ✅ Compare with Revision（与历史版本比较）
+
 右键点击文件 → **Git (IntelliJ IDEA Style)** → **Compare with Revision...**
+
 - 显示该文件的所有提交历史
 - 选择任意历史版本与当前文件进行 Diff 对比
 
 ### ✅ Compare with Branch/Tag（与分支/标签比较）
+
 右键点击文件 → **Git (IntelliJ IDEA Style)** → **Compare with Branch or Tag...**
+
 - 显示所有本地分支、远程分支和标签
 - 选择任意引用与当前文件进行 Diff 对比
+
+### ✅ Rebase onto（变基到分支/标签）
+
+右键点击文件 → **Git (IntelliJ IDEA Style)** → **Rebase onto...**
+
+- 显示所有本地分支、远程分支和标签
+- 选择目标引用进行 rebase 操作
+- 自动检测工作区状态（需要干净的工作区）
+- 支持冲突检测和解决
+- 提供 rebase 继续/中止选项
 
 ## 使用方法
 
@@ -35,14 +49,16 @@ vsce package
 
 ## 项目结构
 
-```
+```text
 ├── src/
 │   ├── extension.ts              # 扩展入口
 │   ├── gitService.ts             # Git 操作服务
 │   ├── gitContentProvider.ts     # 历史版本内容提供者
+│   ├── changesTreeProvider.ts    # 变更树视图提供者
 │   └── commands/
 │       ├── compareWithRevision.ts
-│       └── compareWithBranch.ts
+│       ├── compareWithBranch.ts
+│       └── rebaseOnto.ts
 ├── out/                          # 编译输出
 ├── package.json                  # 扩展清单
 └── tsconfig.json
