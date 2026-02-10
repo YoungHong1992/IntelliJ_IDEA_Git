@@ -59,8 +59,12 @@ export async function rebaseOnto(uri?: vscode.Uri): Promise<void> {
         
         if (action === 'Abort Rebase') {
             const { rebaseAbort } = await import('../gitService');
-            await rebaseAbort(repoRoot);
-            vscode.window.showInformationMessage('Rebase aborted');
+            const abortResult = await rebaseAbort(repoRoot);
+            if (abortResult.success) {
+                vscode.window.showInformationMessage('Rebase aborted');
+            } else {
+                vscode.window.showErrorMessage(`Rebase abort failed: ${abortResult.error}`);
+            }
         } else if (action === 'Continue Rebase') {
             const { rebaseContinue } = await import('../gitService');
             const result = await rebaseContinue(repoRoot);
@@ -123,9 +127,9 @@ export async function rebaseOnto(uri?: vscode.Uri): Promise<void> {
     const remotes = refs.filter(r => r.type === 'remote');
     const tags = refs.filter(r => r.type === 'tag');
 
-    if (remotes.length > 0) {
-        items.push({ label: 'Remote Branches', kind: vscode.QuickPickItemKind.Separator });
-        remotes.forEach(ref => {
+    if (branches.length > 0) {
+        items.push({ label: 'Local Branches', kind: vscode.QuickPickItemKind.Separator });
+        branches.forEach(ref => {
             items.push({
                 label: `${getIcon(ref.type)} ${ref.name}`,
                 description: getLabel(ref.type),
@@ -134,9 +138,9 @@ export async function rebaseOnto(uri?: vscode.Uri): Promise<void> {
         });
     }
 
-    if (branches.length > 0) {
-        items.push({ label: 'Local Branches', kind: vscode.QuickPickItemKind.Separator });
-        branches.forEach(ref => {
+    if (remotes.length > 0) {
+        items.push({ label: 'Remote Branches', kind: vscode.QuickPickItemKind.Separator });
+        remotes.forEach(ref => {
             items.push({
                 label: `${getIcon(ref.type)} ${ref.name}`,
                 description: getLabel(ref.type),
@@ -218,8 +222,12 @@ export async function rebaseOnto(uri?: vscode.Uri): Promise<void> {
                 );
             } else if (action === 'Abort Rebase') {
                 const { rebaseAbort } = await import('../gitService');
-                await rebaseAbort(repoRoot);
-                vscode.window.showInformationMessage('Rebase aborted');
+                const abortResult = await rebaseAbort(repoRoot);
+                if (abortResult.success) {
+                    vscode.window.showInformationMessage('Rebase aborted');
+                } else {
+                    vscode.window.showErrorMessage(`Rebase abort failed: ${abortResult.error}`);
+                }
             }
         } else {
             vscode.window.showErrorMessage(`Rebase failed: ${result.error}`);

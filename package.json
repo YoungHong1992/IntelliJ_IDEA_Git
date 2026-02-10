@@ -30,9 +30,7 @@
     "rebase"
   ],
   "icon": "images/icon.png",
-  "activationEvents": [
-    "*"
-  ],
+  "activationEvents": [],
   "main": "./out/extension.js",
   "contributes": {
     "viewsContainers": {
